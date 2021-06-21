@@ -1,10 +1,10 @@
 #include <cstdio>
 
-typedef struct node_list
-{
+struct node_list {
     int data;
-    struct node_list* prev, *next;
-} node_list;
+    struct node_list* prev;
+    struct node_list* next;
+};
 
 node_list* create_node(int data)
 {
