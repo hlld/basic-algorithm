@@ -35,10 +35,42 @@ void insert_node(node_list* pos, node_list* node)
         pos->next = node;
         node->prev = pos;
         node->next = p;
-        // pos可能是刚创建的头节点
-        if (p != NULL) {
+        if (p != NULL) { // pos可能是创建的头节点
             p->prev = node;
         }
+    }
+}
+
+void insert_node_sort(node_list** head, node_list* node)
+{
+    if (head == NULL || *head == NULL || node == NULL || *head == node) {
+        return;
+    }
+    node_list* p = *head, *q = *head;
+    while (p != NULL) {
+        if (p->data > node->data) {
+            break;
+        }
+        q = p;
+        p = p->next;
+    }
+    if (p != NULL) { // 插入到p的前面
+        if (p == *head) {
+            node->next = p;
+            p->prev = node;
+            // 改变当前head指向
+            *head = node;
+        }
+        else {
+            p->prev->next = node;
+            node->prev = p->prev;
+            node->next = p;
+            p->prev = node;
+        }
+    }
+    else { // 插入到最后节点
+        q->next = node;
+        node->prev = q;
     }
 }
 
