@@ -1,4 +1,7 @@
 #include <cstdio>
+#include <string>
+
+using namespace std;
 
 enum stack_status
 {
@@ -17,7 +20,9 @@ public:
     ~stack();
 
     stack_status push(T t);
-    stack_status pop(T& t);
+    stack_status pop();
+    T top() { return buffer[index]; };
+    int size() { return index + 1; };
 
 private:
     int index{-1};
@@ -56,35 +61,52 @@ stack_status stack<T>::push(T t)
 
 // 先取值再自增堆栈指针
 template <typename T>
-stack_status stack<T>::pop(T& t)
+stack_status stack<T>::pop()
 {
     if (index <= -1) {
         return stack_empty;
     }
-    t = buffer[index--];
+    index--;
     return stack_ok;
+}
+
+// 小猿同学持别热心肠，喜欢帮助同事，听闻有一个同事需要搬家连忙过去帮忙。
+// 小猿将物品放到箱子里。再将小箱子放到大箱子里。小猿奕然忘了用了几个箱子，
+// 你能帮帮它吗?[]代表一个箱子，[]3代表3个箱子，[[]3]代表1个大箱子里放了
+// 3个小箱子一共有4个箱子，[[]3]2代表有2个大箱子，
+// 每个大箱子里放了3个小箱子，一共有8个箱子，假设输入均合法。
+int count_box(string s)
+{
+    stack<int> st(s.size());
+    for (int k = 0; k < s.size(); k++) {
+        if (s[k] == '[') {
+            st.push(0); // 标记压入[符号
+        }
+        else if (s[k] == ']') {
+            int num = 1;
+            while (st.top() != 0) { // 处理当前层[]
+                num += st.top();
+                st.pop();
+            }
+            st.pop();
+            st.push(num);
+        }
+        else { // 处理后缀数字
+            int t = st.top() * (s[k] - '0');
+            st.pop();
+            st.push(t);
+        }
+    }
+    int res = 0;
+    while (st.size() > 0) { // 统计箱子个数
+        res += st.top();
+        st.pop();
+    }
+    return res;
 }
 
 int main(int argc, char* argv[])
 {
-    int len = 10;
-    stack<int> stack(len);
-    for (int k = 0; k < len + 2; k++) {
-        if (stack.push(k) != stack_ok) {
-            printf("stack full\n");
-        }
-        else {
-            printf("push %d\n", k);
-        }
-    }
-    for (int k = 0; k < len + 2; k++) {
-        int tmp;
-        if (stack.pop(tmp) != stack_ok) {
-            printf("stack empty\n");
-        }
-        else {
-            printf("pop %d\n", tmp);
-        }
-    }
+    printf("%d\n", count_box("[[]2][[]3]2"));
     return 0;
 }
